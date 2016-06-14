@@ -1,0 +1,160 @@
+\RequirePackage[l2tabu, orthodox]{nag}
+
+<<echo=FALSE>>=
+
+opts_chunk$set(echo=FALSE)
+library(xtable)
+
+# https://github.com/kbroman/broman/blob/master/R/myround.R
+myround <- function(x, digits=1)
+{
+    if(digits < 1)
+        stop("This is intended for the case digits >= 1.")
+
+    if(length(digits) > 1) {
+        digits <- digits[1]
+        warning("Using only digits[1]")
+    }
+
+    tmp <- sprintf(paste("%.", digits, "f", sep=""), x)
+
+    # deal with "-0.00" case
+    zero <- paste0("0.", paste(rep("0", digits), collapse=""))
+    tmp[tmp == paste0("-", zero)] <- zero
+
+    tmp
+}
+@
+
+\documentclass{article}
+
+\usepackage[paper=a4paper,top=1in,bottom=1in,right=1.5in,left=1.5in]{geometry}
+
+\usepackage{fixltx2e} 				% some standard fixes
+\usepackage{tabularx} 				% better tables
+\usepackage[hidelinks]{hyperref}
+\usepackage{helvet} 				  % I like Helvetica
+\usepackage{authblk} 				  % Footnotes in the author affiliations
+\usepackage{parskip}				  % space between paragraphs
+\usepackage[labelfont=bf,font=small]{caption} 		  % caption font size
+\usepackage[backend=bibtex, sorting=none]{biblatex} % bibliography
+\usepackage{todonotes}				% add notes about todo items
+\usepackage[section]{placeins}		                  % try to fix figure placement
+\usepackage{microtype}				% make output look nicer
+\usepackage{collect}				  % define supplementary figures along with main text, print them later
+\usepackage{mathtools}				% math stuff
+\usepackage{afterpage}        % clear page on demand
+\usepackage[all]{nowidow}     % prevent widow/orphan lines
+
+% Use to include references
+% \bibliography{papers}
+
+\renewcommand{\familydefault}{\sfdefault}
+\renewcommand{\baselinestretch}{1.2}
+
+% add "S" to supplementary figures and tables
+% thanks to http://bytesizebio.net/2013/03/11/adding-supplementary-tables-and-figures-in-latex/
+\newcommand{\beginsupplement}{%
+    \setcounter{table}{0}
+    \renewcommand{\thetable}{S\arabic{table}}%
+    \setcounter{figure}{0}
+    \renewcommand{\thefigure}{S\arabic{figure}}%
+ }
+
+\definecollection{supplement}
+\newcommand{\supplement}[1]{\begin{collect}{supplement}{\FloatBarrier #1 \FloatBarrier}{}\end{collect}}
+
+
+\begin{document}
+
+\setcounter{secnumdepth}{0}
+
+\title{Knitr \LaTeX template with supplement}
+\author[1,*]{Michael Kuhn}
+
+\affil[1]{\footnotesize EMBL, Heidelberg, Germany}
+\affil[*]{\footnotesize To whom correspondence should be addressed: \href{mailto:michael.kuhn@gmail.com}{\nolinkurl{michael.kuhn@gmail.com}} (Phone: ...) }
+
+\date{}
+
+\maketitle
+
+\begin{abstract}
+This template contains styles to make a nice \LaTeX document. In particular, it allows you to interleave main manuscript and supplemental text as you're writing the manuscript by wrapping text and figures in \texttt{\textbackslash supplement$\left\{...\right\}$}.
+
+\end{abstract}
+
+
+\section{Introduction}
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec id augue et mauris vulputate rhoncus. Phasellus eleifend lobortis metus porttitor egestas. Aenean porttitor vulputate risus lacinia lacinia. Nullam ac magna ullamcorper, facilisis lectus eget, laoreet risus. Ut ultrices quam in libero vulputate volutpat. Etiam nisi purus, luctus ac elit eget, egestas finibus orci. Sed vulputate iaculis tortor, vitae efficitur magna pulvinar eget. Sed ornare malesuada viverra. Curabitur sagittis condimentum rutrum. Vestibulum ac leo sit amet justo elementum ultrices eget eget felis. Donec id feugiat velit. Nam porttitor scelerisque dolor. Nullam risus purus, rhoncus id aliquam vel, aliquet nec diam.
+
+Donec sed ipsum velit. Integer lobortis ex ac purus egestas, at mattis arcu porttitor. Etiam auctor lectus at tellus bibendum tristique. Cras vestibulum consectetur massa, id convallis odio semper eget. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Duis sit amet lectus tempor, rhoncus sem quis, eleifend libero. Vestibulum varius odio eget porta accumsan. Pellentesque tempor lectus ex, et dictum purus rutrum a. Quisque pellentesque, libero sed sagittis commodo, dui elit cursus libero, nec molestie lacus mauris eget magna. Mauris viverra id odio sed maximus. Vivamus tristique, est et luctus pharetra, orci nulla lobortis leo, at luctus diam orci non arcu. Sed finibus bibendum dolor, eu dignissim tellus dictum vitae. Sed eu fringilla mi, quis imperdiet nisl. Nulla faucibus dolor ullamcorper lacus maximus ultrices. Proin eget mi erat. Aliquam erat volutpat.
+
+\section{Results}
+
+<<species, results="asis">>=
+
+example_df <- data.frame(Species = c("Human", "Mouse"), N = c(10, 20))
+
+tab <- xtable(example_df, escape=FALSE, align = "lll", label="table:species", caption="Analyzed species and datasets")
+
+print(tab, sanitize.text.function=identity, include.rownames=FALSE, tabular.environment="tabularx", width="\\textwidth", size="\\small")
+
+@
+\afterpage{\clearpage}
+
+Nullam convallis velit sed magna pharetra tincidunt (Table~\ref{table:species}). Nulla molestie quis sem eget sollicitudin. Integer consectetur nunc in orci euismod fringilla. Nullam varius mollis orci vel vulputate. Nunc sem est, cursus accumsan urna at, rhoncus facilisis nunc. Pellentesque volutpat quam laoreet maximus fringilla. Proin tristique nisl sit amet metus varius iaculis. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Mauris laoreet purus quis sem sagittis imperdiet. Integer vehicula urna vitae leo vehicula, et tristique diam consequat. Sed pulvinar quis enim quis aliquet. Duis eu dignissim justo, a tincidunt libero. Aliquam id justo dolor. Etiam viverra erat mauris. Curabitur et gravida neque.
+
+\supplement{
+    \begin{figure}[hbt]
+        % \includegraphics[width=\textwidth]{include_me.pdf}
+        \caption{
+            \textbf{An example figure in the supplement.} Add caption here.
+        }
+        \label{fig:test1}
+    \end{figure}
+
+    \subsection{A very detailed explanation}
+    Aliquam vulputate purus eget justo malesuada posuere (Fig.~\ref{fig:test1}). Nam eget libero velit. Sed eu eros vel tellus maximus malesuada laoreet non libero. Aenean urna elit, auctor vel feugiat accumsan, pretium sed nunc. Ut est neque, elementum eget ante eget, dignissim congue lectus. Ut porta non sapien in egestas. Phasellus congue euismod diam, ut sagittis leo placerat et. Sed mollis ullamcorper lobortis. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos.
+}
+
+\subsection{Figure references}
+
+\begin{figure}[hbt]
+    % \includegraphics[width=\textwidth]{include_me.pdf}
+    \caption{
+        \textbf{An example figure in the main text.} Add caption here.
+    }
+    \label{fig:test2}
+\end{figure}
+
+Sed porta urna consequat, vestibulum ipsum quis, iaculis libero (Figs.~\ref{fig:test1} and~\ref{fig:test2}). Praesent massa arcu, imperdiet tempor imperdiet condimentum, venenatis vel erat. Etiam vulputate dolor ut auctor dapibus. Quisque ac risus ultricies, finibus ipsum eget, finibus dui. Proin vitae tristique metus, vel placerat sem. Etiam hendrerit et massa porttitor sagittis. Nam quis elementum nulla, et lobortis augue. Sed egestas neque ante, a porttitor ante sodales at. In ut lorem non enim dignissim dictum. Proin in fringilla mauris, sit amet semper ligula. Aliquam semper tristique tellus quis auctor. Fusce quis molestie ligula, quis maximus elit. Proin ut euismod lorem, sit amet viverra mauris.
+
+\supplement{
+    \subsection{One more paragraph that will go to the supplement}
+    Mauris bibendum ipsum sit amet felis dignissim, at ullamcorper mi tincidunt. Aliquam eget sem et libero lobortis tempor. Sed semper dui nisl, a placerat mauris ultricies nec. Quisque pharetra finibus magna, et ultricies nisl feugiat et. Pellentesque consectetur auctor facilisis. Nam ac mi ac orci dictum sodales. Phasellus sit amet orci non augue ultrices efficitur quis et lorem. Nulla quis pretium diam. Nullam in elementum libero.
+
+}
+
+\section{Discussion}
+
+Donec et convallis sem. Cras quis libero at ex tempus elementum ac feugiat magna. In et mauris libero. Aliquam nunc est, semper vel rhoncus nec, auctor nec felis. Vestibulum posuere rhoncus sem id viverra. Ut aliquet fermentum justo, quis vulputate enim ultricies ac. Pellentesque id tortor egestas, condimentum tortor eget, tristique nulla. Nunc mattis enim eu pellentesque tristique. Cras at lectus nisl.
+
+\begin{equation}
+    a^2 + b^2 = c^2
+\end{equation}
+
+
+\section{Acknowledgements}
+
+Thanks to Karl Broman and Iddo Friedberg for helpful information on their blogs.
+
+
+\beginsupplement
+
+\section{Supplementary Information}
+
+\includecollection{supplement}
+
+\end{document}
